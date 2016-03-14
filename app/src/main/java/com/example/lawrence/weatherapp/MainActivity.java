@@ -10,6 +10,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,6 +28,7 @@ import okhttp3.Response;
 public class MainActivity extends ActionBarActivity {
 
     public static final String TAG = MainActivity.class.getSimpleName();
+    private CurrentWeather mCurrentWeather;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +36,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         String apiKey = getAPIKey();
-        double latitude = 37.8268;
-        double longitude = -122.422; //Alcatraz Island, CA
+        double latitude = 37.8268; double longitude = -122.422; //Alcatraz Island, CA
         //latitude = 40.7791; longitude = -73.9635;       // Central Park, New York City, NY
         //latitude = 41.8661; longitude = --87.6169;      // Millennium Park, Chicago, IL
         // there is a slight bug where it doesn't update the location if you change lat/long.
@@ -41,7 +44,6 @@ public class MainActivity extends ActionBarActivity {
         String forecastUrl = "https://api.forecast.io/forecast/" + apiKey + "/" + latitude + "," + longitude;
 
         if (isNetworkAvailable()) {
-
 
             // create a new OkHTTP client to connect to API.
             OkHttpClient client = new OkHttpClient();
@@ -69,25 +71,51 @@ public class MainActivity extends ActionBarActivity {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     try {
-                        Log.v(TAG, response.body().string()); // output JSON data to log to spot-check that we are getting valid data from API.
+                        String JSONdata = response.body().string();
+                        Log.v(TAG, JSONdata); // output JSON data to log to spot-check that we are getting valid data from API.
 
                         if (response.isSuccessful()) {
-
+                            mCurrentWeather = getCurrentDetails(JSONdata);
                         } else {
                             alertUserAboutError();
                         }
 
-                    } catch (IOException e) {
-                        Log.e(TAG, "Exception caught: ", e);
+                    } catch(IOException ioe) {
+                        Log.e(TAG, "IOException caught: ", ioe);
+                    } catch(JSONException jsone) {
+                        // handle JSON exception here, instead of in the method.
+                        Log.e(TAG, "JSONException caught: ", jsone);
                     }
                 } //end onResponse()
 
-            });
+            }); //end anonymous inner class
 
         } else {
             Toast.makeText(this, R.string.network_unavailable_message, Toast.LENGTH_LONG).show();
         }
         Log.d(TAG, "Main UI code running.");
+    } // end onCreate()
+
+    // convert JSON data (string) into our model for the weather (temp, time, humidity, etc.)
+    private CurrentWeather getCurrentDetails(String jsondata) throws JSONException{
+        JSONObject forecast = new JSONObject(jsondata);
+
+        String timezone = forecast.getString("timezone");
+        Log.i(TAG, "From JSON: " + timezone);
+
+        JSONObject currently = forecast.getJSONObject("currently");
+        CurrentWeather currentWeather = new CurrentWeather();
+        currentWeather.setHumidity(currently.getDouble("humidity"));
+        currentWeather.setTime(currently.getLong("time"));
+        currentWeather.setIcon(currently.getString("icon"));
+        currentWeather.setPrecipChance(currently.getDouble("precipProbability"));
+        currentWeather.setSummary(currently.getString("summary"));
+        currentWeather.setTemperature(currently.getDouble("temperature"));
+        currentWeather.setTimeZone(timezone);
+
+        Log.d(TAG, currentWeather.getFormattedTime());
+
+        return currentWeather;
     }
 
     private boolean isNetworkAvailable() {
