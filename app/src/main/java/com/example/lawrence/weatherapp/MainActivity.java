@@ -1,11 +1,17 @@
 package com.example.lawrence.weatherapp;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -22,7 +28,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String apiKey = "27974c4bc33201748eaf542a6769c3a8";
+        String apiKey = getAPIKey();
         double latitude = 37.8268;
         double longitude = -122.422;
         String forecastUrl = "https://api.forecast.io/forecast/" + apiKey + "/" + latitude + "," + longitude;
@@ -64,5 +70,36 @@ public class MainActivity extends ActionBarActivity {
 
         });
     }
+
+    // Helper methods to hide API Key in assets folder so that it isn't visible on GitHub.
+    private String getAPIKey(){
+        Properties prop = loadProperties();
+        String apiKey = prop.getProperty("apikey");
+        return apiKey;
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private Properties loadProperties(){
+        Properties prop = new Properties();
+        String[] fileList = {"config.properties"};   // can get multiple property files if you want.
+
+        for( int i=fileList.length-1; i >= 0; --i ){
+            String file = fileList[i];
+
+            // using new try-with-resoruces syntax in Java 7 to open file.
+            // don't need to use "finally" block.
+            try( InputStream inputStream = getAssets().open(file) ) {   //
+                prop.load(inputStream);
+                inputStream.close(); // do we need to explicitly close stream with try-with-resources?
+            } catch( FileNotFoundException fnfe ) {
+                Log.d(TAG, "Ignoring missing property file " + file);
+            } catch( IOException ioe ) {
+                Log.e(TAG, "More general input/output exception", ioe);
+            }
+        }
+
+        return prop;
+    }
+
 
 } // end MainActivity class
