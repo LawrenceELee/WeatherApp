@@ -55,6 +55,12 @@ public class CurrentWeather {
         return iconId;
     }
 
+    public int getTemperature() {
+        return (int) Math.round(mTemperature);
+    }
+    public int getPrecipChance() {
+        return (int) Math.round(mPrecipChance * 100);
+    }
 
     public String getIcon() {
         return mIcon;
@@ -72,10 +78,6 @@ public class CurrentWeather {
         mTime = time;
     }
 
-    public double getTemperature() {
-        return mTemperature;
-    }
-
     public void setTemperature(double temperature) {
         mTemperature = temperature;
     }
@@ -86,10 +88,6 @@ public class CurrentWeather {
 
     public void setHumidity(double humidity) {
         mHumidity = humidity;
-    }
-
-    public double getPrecipChance() {
-        return mPrecipChance;
     }
 
     public void setPrecipChance(double precipChance) {
