@@ -1,10 +1,12 @@
-package com.example.lawrence.weatherapp;
+package com.example.lawrence.weatherapp.ui;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
+
+import com.example.lawrence.weatherapp.R;
 
 // Dialog box to alert user there was an error then "OK" button.
 // Fragments are similar to Activities.
