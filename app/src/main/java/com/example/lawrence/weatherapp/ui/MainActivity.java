@@ -17,8 +17,11 @@ import android.widget.Toast;
 
 import com.example.lawrence.weatherapp.R;
 import com.example.lawrence.weatherapp.weather.Current;
+import com.example.lawrence.weatherapp.weather.Day;
 import com.example.lawrence.weatherapp.weather.Forecast;
+import com.example.lawrence.weatherapp.weather.Hour;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -239,13 +242,70 @@ public class MainActivity extends ActionBarActivity {
 
     private Forecast parseForecastDetails(String jsonData) throws JSONException{
         Forecast forecast = new Forecast();
+
         forecast.setCurrent(getCurrentDetails(jsonData));
+        forecast.setHourlyForecast(getHourlyForecast(jsonData));
+        forecast.setDailyForecast(getDailyForecast(jsonData));
+
         return forecast;
     }
 
+    private Day[] getDailyForecast(String jsonData) throws JSONException{
+        JSONObject forecast = new JSONObject(jsonData);
+        String timezone = forecast.getString("timezone");
+        JSONObject daily = forecast.getJSONObject("daily"); // gets daily JSON object just below root.
+        JSONArray data = daily.getJSONArray("data"); // each hour is stored under "data" key.
+
+        Day[] days = new Day[data.length()];
+        for( int i=0; i < days.length; ++i ){
+            JSONObject jsonDay = data.getJSONObject(i);
+
+            Day day = new Day(); // TODO: try just putting the Day day = null; part outside for-loop.
+
+            day.setSummary(jsonDay.getString("summary"));
+            day.setIcon(jsonDay.getString("icon"));
+            day.setTemperatureMax(jsonDay.getDouble("temperatureMax"));
+            day.setTime(jsonDay.getLong("time"));
+            day.setTimezone(timezone);
+
+            days[i] = day;
+        }
+
+        return days;
+    }
+
+    private Hour[] getHourlyForecast(String jsonData) throws JSONException{
+        JSONObject forecast = new JSONObject(jsonData);
+        String timezone = forecast.getString("timezone");
+        JSONObject hourly = forecast.getJSONObject("hourly"); // gets hourly JSON object just below root.
+        JSONArray data = hourly.getJSONArray("data"); // each hour is stored under "data" key.
+
+        // populate each hour in hour array with corresponding data.
+        Hour[] hours = new Hour[data.length()];
+        for( int i=0; i < hours.length; ++i ){
+            JSONObject jsonHour = data.getJSONObject(i);
+
+            Hour hour = new Hour(); // TODO: try just putting the Hour hour = null; part outside for-loop.
+            // be careful to NOT place this statement outside the for-loop
+            // because then we would have just ONE hour object updating i times
+            // and all elemnts of array would be point to the same hour object.
+            // instead of creating i hour objects.
+
+            hour.setSummary(jsonHour.getString("summary"));
+            hour.setTemperature(jsonHour.getDouble("temperature"));
+            hour.setIcon(jsonHour.getString("icon"));
+            hour.setTime(jsonHour.getLong("time"));
+            hour.setTimezone(timezone);
+
+            hours[i] = hour;
+        }
+
+        return hours;
+    }
+
     // convert JSON data (string) into our model for the weather (temp, time, humidity, etc.)
-    private Current getCurrentDetails(String jsondata) throws JSONException {
-        JSONObject forecast = new JSONObject(jsondata);
+    private Current getCurrentDetails(String jsonData) throws JSONException {
+        JSONObject forecast = new JSONObject(jsonData);
 
         String timezone = forecast.getString("timezone");
         Log.i(TAG, "From JSON: " + timezone);
