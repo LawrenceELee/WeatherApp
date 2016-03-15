@@ -83,7 +83,12 @@ import okhttp3.Response;
  */
 public class MainActivity extends ActionBarActivity {
 
+    // define a key for the MainActivity class
     public static final String TAG = MainActivity.class.getSimpleName();
+
+    // define a key so we can look up code involving DailyForecast.
+    public static final String DAILY_FORECAST = "DAILY_FORECAST";
+
     private Forecast mForecast;
 
     // using ButterKnife library to bind MainActivity (controller) with layout (view).
@@ -361,6 +366,12 @@ public class MainActivity extends ActionBarActivity {
     @OnClick(R.id.dailyButton)
     public void startDailyActivity(View view){
         Intent intent = new Intent(this, DailyForecastActivity.class);
+
+        // can add extra data to an "intent" using the putExtra() method.
+        // we are doing this to send over the array of Day objects to the list in DailyForecastActivity.
+        // use a key (DAILY_FORECAST) to label this extra, and value is the extra we want to send over.
+        intent.putExtra(DAILY_FORECAST, mForecast.getDailyForecast());
+
         startActivity(intent);
     }
 
