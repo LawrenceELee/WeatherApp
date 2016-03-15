@@ -1,10 +1,12 @@
-package com.example.lawrence.weatherapp;
+package com.example.lawrence.weatherapp.weather;
+
+import com.example.lawrence.weatherapp.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-public class CurrentWeather {
+public class Current {
     private String mIcon;
     // the icon is a string in the JSON data, but we convert to an int to get the right icon in resources. see getIconId() below.
     private long mTime;
