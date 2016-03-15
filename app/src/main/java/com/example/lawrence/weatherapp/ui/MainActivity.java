@@ -282,10 +282,13 @@ public class MainActivity extends ActionBarActivity {
 
         // populate each hour in hour array with corresponding data.
         Hour[] hours = new Hour[data.length()];
+        JSONObject jsonHour = null;
+        Hour hour = null;
         for( int i=0; i < hours.length; ++i ){
-            JSONObject jsonHour = data.getJSONObject(i);
 
-            Hour hour = new Hour(); // TODO: try just putting the Hour hour = null; part outside for-loop.
+            // TODO: after modification, it still works the same as before.
+            jsonHour = data.getJSONObject(i);
+            hour = new Hour();
             // be careful to NOT place this statement outside the for-loop
             // because then we would have just ONE hour object updating i times
             // and all elemnts of array would be point to the same hour object.
