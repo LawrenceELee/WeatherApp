@@ -2,6 +2,7 @@ package com.example.lawrence.weatherapp.ui;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -32,6 +33,7 @@ import java.util.Properties;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -342,6 +344,24 @@ public class MainActivity extends ActionBarActivity {
     private void alertUserAboutError() {
         AlertDialogFragment dialog = new AlertDialogFragment();
         dialog.show(getFragmentManager(), "error_dialog");
+    }
+
+    /*
+    Use ButterKnife to "inject/bind" an onClickListener for a view.
+    instead of old way:
+    mRefreshImageView.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        getForecast(latitude, longitude);
+      }
+    });
+    */
+    // new way using ButterKnife. it will "inject/bind" startDailyActivity() to dailyButton.
+    // new View.OnClickListener() { ... void onClick(View view) { startDailyActivity(myParameter) }} ...
+    @OnClick(R.id.dailyButton)
+    public void startDailyActivity(View view){
+        Intent intent = new Intent(this, DailyForecastActivity.class);
+        startActivity(intent);
     }
 
     // Helper methods to hide API Key in assets folder so that it isn't visible on GitHub.
