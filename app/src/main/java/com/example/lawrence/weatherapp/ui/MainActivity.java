@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.example.lawrence.weatherapp.R;
 import com.example.lawrence.weatherapp.weather.Current;
+import com.example.lawrence.weatherapp.weather.Forecast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -78,7 +79,7 @@ import okhttp3.Response;
 public class MainActivity extends ActionBarActivity {
 
     public static final String TAG = MainActivity.class.getSimpleName();
-    private Current mCurrent;
+    private Forecast mForecast;
 
     // using ButterKnife library to bind MainActivity (controller) with layout (view).
     // instead of old boilerplate style of declaring a member variable for corresponding view item.
@@ -183,13 +184,16 @@ public class MainActivity extends ActionBarActivity {
                         Log.v(TAG, JSONdata); // output JSON data to log to spot-check that we are getting valid data from API.
 
                         if (response.isSuccessful()) {
-                            mCurrent = getCurrentDetails(JSONdata);
+
+                            mForecast = parseForecastDetails(JSONdata);
+
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     updateDisplay();
                                 }
                             });
+
                         } else {
                             alertUserAboutError();
                         }
@@ -221,15 +225,22 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void updateDisplay() {
-        mTemperatureLabel.setText(mCurrent.getTemperature() + "");
-        mTimeLabel.setText("At " + mCurrent.getFormattedTime() + " it will be");
-        mHumidityValue.setText(mCurrent.getHumidity() + "");
-        mPrecipValue.setText(mCurrent.getPrecipChance() + "%");
-        mSummaryLabel.setText(mCurrent.getSummary());
+        Current current = mForecast.getCurrent();
+        mTemperatureLabel.setText(current.getTemperature() + "");
+        mTimeLabel.setText("At " + current.getFormattedTime() + " it will be");
+        mHumidityValue.setText(current.getHumidity() + "");
+        mPrecipValue.setText(current.getPrecipChance() + "%");
+        mSummaryLabel.setText(current.getSummary());
 
         // convert int into the corresponding picture in the layout
-        Drawable drawable = getResources().getDrawable(mCurrent.getIconId());
+        Drawable drawable = getResources().getDrawable(current.getIconId());
         mIconImageView.setImageDrawable(drawable);
+    }
+
+    private Forecast parseForecastDetails(String jsonData) throws JSONException{
+        Forecast forecast = new Forecast();
+        forecast.setCurrent(getCurrentDetails(jsonData));
+        return forecast;
     }
 
     // convert JSON data (string) into our model for the weather (temp, time, humidity, etc.)
