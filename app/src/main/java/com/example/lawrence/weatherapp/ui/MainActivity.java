@@ -86,8 +86,10 @@ public class MainActivity extends ActionBarActivity {
     // define a key for the MainActivity class
     public static final String TAG = MainActivity.class.getSimpleName();
 
-    // define a key so we can look up code involving DailyForecast.
+    // define a key so we can look up code involving DailyForecastActivity.
     public static final String DAILY_FORECAST = "DAILY_FORECAST";
+    // similarly for HourlyForecastActivity.
+    public static final String HOURLY_ACTIVITY = "HOURLY_FORECAST";
 
     private Forecast mForecast;
 
@@ -372,6 +374,15 @@ public class MainActivity extends ActionBarActivity {
         // use a key (DAILY_FORECAST) to label this extra, and value is the extra we want to send over.
         intent.putExtra(DAILY_FORECAST, mForecast.getDailyForecast());
 
+        startActivity(intent);
+    }
+
+    // OnClickListener for HourlyForecastActivity using ButterKnife to "inject" into "Hourly"
+    // button in MainActivity.
+    @OnClick(R.id.hourlyButton)
+    public void startHourlyActivity(View view){
+        Intent intent = new Intent(this, HourlyForecastActivity.class);
+        intent.putExtra(HOURLY_ACTIVITY, mForecast.getHourlyForecast());
         startActivity(intent);
     }
 

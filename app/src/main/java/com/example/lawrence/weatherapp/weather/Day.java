@@ -23,7 +23,7 @@ public class Day implements Parcelable{
         mIcon = in.readString();
         mTimezone = in.readString();
     }
-    // we need a empty default construtor because of the constructor that takes a Parcel object.
+    // we need a empty default constructor because of the constructor that takes a Parcel object.
     public Day(){ }
 
     public static final Creator<Day> CREATOR = new Creator<Day>() {
