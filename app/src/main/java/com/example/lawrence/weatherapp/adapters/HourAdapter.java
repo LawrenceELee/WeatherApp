@@ -1,11 +1,13 @@
 package com.example.lawrence.weatherapp.adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.lawrence.weatherapp.R;
 import com.example.lawrence.weatherapp.weather.Hour;
@@ -26,9 +28,11 @@ import com.example.lawrence.weatherapp.weather.Hour;
  */
 public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder> {
     private Hour[] mHours;
+    private Context mContext;
 
-    public HourAdapter(Hour[] hours){
-       mHours = hours;
+    public HourAdapter(Context context, Hour[] hours){
+        mContext = context;
+        mHours = hours;
     }
 
     // called when a new ViewHolder is needed. Views are still recycled but they are created here as needed.
@@ -56,7 +60,9 @@ public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder
 
     // getView() has moved from the Adapter into the ViewHolder.
     // This is required for RecyclerViews.
-    public class HourViewHolder extends RecyclerView.ViewHolder{
+    // clicks/taps in RecyclerViews are handled by whatever implements interface for OnClickListener.
+    // one way to do this is to make ViewHolder class implement the listener.
+    public class HourViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView mTimeLabel;
         public TextView mSummaryLabel;
         public TextView mTemperatureLabel;
@@ -70,7 +76,9 @@ public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder
             mSummaryLabel = (TextView) itemView.findViewById(R.id.summaryLabel);
             mTemperatureLabel = (TextView) itemView.findViewById(R.id.temperatureLabel);
             mIconImageView = (ImageView) itemView.findViewById(R.id.iconImageView);
-        }
+
+            itemView.setOnClickListener(this);  // needed for clicks/taps.
+        } // end constructor for HourViewHolder
 
         // this method bind/map all the data to the View.
         public void bindHour(Hour hour){
@@ -79,6 +87,29 @@ public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder
             mTemperatureLabel.setText(hour.getTemperature() + "");
             mIconImageView.setImageResource(hour.getIconId());
         }
-    }
 
-}
+        @Override
+        public void onClick(View view) {
+            // how do we assign values to these local variables?
+            // the problem is that the binding happens in the bindHour() method above,
+            // but the Hour hour is an argument to the method and is destroy once we leave bindHour's scope.
+            // one solution is to create a member variable for hour, but that's extra work
+            // since we can just extra the information from the member labels and convert char sequence to a string.
+            String time = mTimeLabel.getText().toString();
+            String temperature = mTemperatureLabel.getText().toString();
+            String summary = mSummaryLabel.getText().toString();
+            String message = String.format(
+                    "At %s it will be %s and %s",
+                    time,
+                    temperature,
+                    summary
+            );
+            // since we are in a custom adapter, we need to pass in the context where this is being used.
+            // (i.e. can't use "this" for the context as parameter for makeToast())
+            // solution is to pass in the context in our HourAdapter constructor and make context a member variable.
+            Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
+
+        }
+    } // end nested inner class ViewHolder
+
+} // end HourAdapter class

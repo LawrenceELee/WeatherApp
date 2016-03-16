@@ -45,7 +45,7 @@ public class HourlyForecastActivity extends ActionBarActivity {
         // convert Parcelable array into Hour array.
         mHours = Arrays.copyOf(parcelables, parcelables.length, Hour[].class);
 
-        HourAdapter adapter = new HourAdapter(mHours);
+        HourAdapter adapter = new HourAdapter(this, mHours);
         mRecyclerView.setAdapter(adapter);
 
         // layout manger component determines when list items are no longer visible and therefore can be reused.
