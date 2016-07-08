@@ -80,6 +80,30 @@ import okhttp3.Response;
  * 7) Building an User Interface (UI):
  * use ButterKnife to bind controller (MainActivity) with view (layout) (saves time by not having to write boilerplate code).
  *
+ * MVC pattern:
+ * model (CurrentWeather.java)
+ * view (layout files, resource)
+ * controller (MainActivity.java)
+ *
+ *
+ * Building List in Android:
+ * follow the MVC pattern data being the model, view being views in layout, and  * adapters being the the controller.
+ *
+ * Simple default listviews and list adapters.
+ * don't have to buld your own list item.
+ *
+ * Custom listviews and customer list adapters.
+ * have to build your own list_item.xml which feeds into the listadapter which
+ * populates the listview
+ *
+ * ListViews create each list item in the list as needed versus using a lot of memory and creating all of them at once. (just-in-time approach).
+ *
+ * Recycler views (available for Android 5+).
+ * reuses list items that are off the screen to create new list items to scroll into view.
+ *
+ * Interaction with ListView elements
+ * code to do stuff when item is tapped.
+ *
  */
 public class MainActivity extends ActionBarActivity {
 
